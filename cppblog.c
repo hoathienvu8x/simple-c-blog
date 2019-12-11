@@ -26,6 +26,11 @@ int main(int argc, char **argv) {
     blockquote_tag("This is simple and the first idea blog on c code, using cgi + sqlite to store database");
     const char *path_info = getenv("REQUEST_URI");
     if (path_info != NULL) {
+		if (strcmp(path_info,"/") == 0) {
+			p_tag("That homepage");
+			goto BREAKOUT;
+			return 0;
+		}
         p_tag("Request URI: " + std::string(path_info));
         std::regex rx = make_regex("^/tu-khoa/(.+)?/?$", true);
         std::smatch res;
@@ -33,27 +38,36 @@ int main(int argc, char **argv) {
         if(std::regex_search(path, res, rx)) {
             if (res.size() > 1) {
                 p_tag("Tag: " + decode_url(std::string(res[1])));
+                goto BREAKOUT;
+				return 0;
             }
         }
         rx = make_regex("^/chuyen-muc/(.+)?/?$", true);
         if(std::regex_search(path, res, rx)) {
             if (res.size() > 1) {
                 p_tag("Category: " + decode_url(std::string(res[1])));
+                goto BREAKOUT;
+				return 0;
             }
         }
         rx = make_regex("^/(.+)/amp?/?$", true);
         if(std::regex_search(path, res, rx)) {
             if (res.size() > 1) {
-                p_tag("Entry: " + decode_url(std::string(res[1])));
+                p_tag("Entry AMP: " + decode_url(std::string(res[1])));
+                goto BREAKOUT;
+				return 0;
             }
         }
         rx = make_regex("^/(.+)?/?$", true);
         if(std::regex_search(path, res, rx)) {
             if (res.size() > 1) {
                 p_tag("Entry: " + decode_url(std::string(res[1])));
+                goto BREAKOUT;
+				return 0;
             }
         }
     }
+BREAKOUT:
     body_end();
     html_end();
     return 0;
