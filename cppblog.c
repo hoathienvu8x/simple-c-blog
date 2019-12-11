@@ -27,12 +27,30 @@ int main(int argc, char **argv) {
     const char *path_info = getenv("REQUEST_URI");
     if (path_info != NULL) {
         p_tag("Request URI: " + std::string(path_info));
-        std::regex rx = make_regex("^/tu-khoa/(.*)?/?$", true);
+        std::regex rx = make_regex("^/tu-khoa/(.+)?/?$", true);
         std::smatch res;
         std::string path = std::string(path_info); // https://stackoverflow.com/a/30495370
         if(std::regex_search(path, res, rx)) {
             if (res.size() > 1) {
                 p_tag("Tag: " + decode_url(std::string(res[1])));
+            }
+        }
+        rx = make_regex("^/chuyen-muc/(.+)?/?$", true);
+        if(std::regex_search(path, res, rx)) {
+            if (res.size() > 1) {
+                p_tag("Category: " + decode_url(std::string(res[1])));
+            }
+        }
+        rx = make_regex("^/(.+)/amp?/?$", true);
+        if(std::regex_search(path, res, rx)) {
+            if (res.size() > 1) {
+                p_tag("Entry: " + decode_url(std::string(res[1])));
+            }
+        }
+        rx = make_regex("^/(.+)?/?$", true);
+        if(std::regex_search(path, res, rx)) {
+            if (res.size() > 1) {
+                p_tag("Entry: " + decode_url(std::string(res[1])));
             }
         }
     }
