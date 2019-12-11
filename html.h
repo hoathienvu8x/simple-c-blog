@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include "util.h"
 
 void html_doctype() {
     std::cout << "<!doctype html>";
@@ -18,6 +19,15 @@ void html_end() {
 
 void head_begin() {
     std::cout << "<head>";
+}
+void meta_equiv(){
+	std::cout << "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />";
+}
+void meta_viewport() {
+	std::cout << "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0\" />";
+}
+void site_stylesheet(std::string domain = "/") {
+	std::cout << "<link href=\"" << rtrim(domain,"/") << "/style.css\" rel=\"stylesheet\" type=\"text/css\" />";
 }
 void head_end() {
     std::cout << "</head>";

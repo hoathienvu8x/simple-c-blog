@@ -18,7 +18,10 @@ int main(int argc, char **argv) {
     html_doctype();
     html_begin();
     head_begin();
+    meta_equiv();
+    meta_viewport();
     title_tag("CPP Blog");
+    site_stylesheet("/");
     head_end();
     body_begin();
     h1_tag("This is CPP Blog");
