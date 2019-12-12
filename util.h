@@ -4,11 +4,66 @@
 #include <assert.h>
 #include <string>
 #include <iostream>
-
+#include <sys/stat.h>
+#if defined _WIN32 || defined __CYGWIN__ || defined WIN32
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
+    #define PATH_SEPARATOR "\\" 
+    #define stat _stat
+    #define mkdir(p,m) _mkdir(p)
+    #include <windows.h>
+#else
+    #include <unistd.h>
+    #define GetCurrentDir getcwd
+    #define PATH_SEPARATOR "/" // https://stackoverflow.com/a/12971978
+#endif
 typedef struct {
     std::string name, slug;
 } term_t;
-
+// https://stackoverflow.com/a/12774387
+bool file_exists(const std::string& name) {
+    struct stat buffer;
+    return (stat (name.c_str(), &buffer) == 0);
+}
+bool is_dir(const std::string &path) {
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0) {
+        return false;
+    }
+    return (info.st_mode & S_IFDIR) != 0;
+}
+bool mkdirAll(const std::string& path) {
+    if (is_dir(path)) {
+        return true;
+    }
+    mode_t mode = 0755;
+    int ret = mkdir(path.c_str(), mode);
+    if (ret == 0) {
+        return true;
+    }
+    switch (errno) {
+        case ENOENT: {
+            size_t pos = path.find_last_of(PATH_SEPARATOR);
+            if (pos == std::string::npos) {
+                return false;
+            }
+            if ( ! mkdirAll(path.substr(0, pos)) ) {
+                return false;
+            }
+        }
+        return 0 == mkdir(path.c_str(), mode);
+        case EEXIST: return is_dir(path);
+        default: return false;
+    }
+}
+std::string getexepath() {
+    char buff[FILENAME_MAX];
+    if(GetCurrentDir( buff, FILENAME_MAX ) == NULL) {
+        return "./";
+    }
+    std::string current_working_dir(buff);
+    return current_working_dir + PATH_SEPARATOR;
+}
 std::string& ltrim(std::string& str, const std::string& chars = "\t\n\v\f\r ") {
     str.erase(0, str.find_first_not_of(chars));
     return str;
